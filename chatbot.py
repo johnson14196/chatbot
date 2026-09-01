@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 from groq import Groq
 
@@ -153,4 +153,3 @@ if user_text:
 
     except Exception as e:
         st.error(f"⚠️ Error: {e}")
-```
