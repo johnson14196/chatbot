@@ -1,4 +1,3 @@
-!pip install groq ipywidgets -q
 import os
 from getpass import getpass
 
