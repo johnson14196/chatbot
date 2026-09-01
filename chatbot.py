@@ -1,114 +1,156 @@
-import os
-from getpass import getpass
-
-# Get your free API key from https://console.groq.com/keys
-os.environ["GROQ_API_KEY"] = getpass("Enter your Groq API key: ")
-import ipywidgets as widgets
-from IPython.display import display, HTML, clear_output
+```python
+import streamlit as st
 from groq import Groq
 
-client = Groq(api_key=os.environ["GROQ_API_KEY"])
+# -------------------------------------------------
+# Page Configuration
+# -------------------------------------------------
+st.set_page_config(
+    page_title="Groq AI Chatbox",
+    page_icon="🤖",
+    layout="centered"
+)
 
-# Model choice — llama-3.3-70b-versatile is a strong general-purpose default
-MODEL =  "openai/gpt-oss-120b"
-# Conversation history (system prompt sets the assistant's behavior)
-messages = [
-    {"role": "system", "content": "You are a helpful, concise assistant."}
-]
+st.title("🤖 Groq AI Chatbox")
 
-# ---------- Widgets ----------
-chat_output = widgets.Output(
-    layout=widgets.Layout(
-        border="1px solid #ccc", height="400px", overflow_y="auto", padding="10px"
+# -------------------------------------------------
+# Sidebar - Settings
+# -------------------------------------------------
+with st.sidebar:
+    st.header("⚙️ Settings")
+
+    # Groq API Key
+    api_key = st.text_input(
+        "🔑 Groq API Key",
+        type="password",
+        placeholder="Enter your Groq API key"
     )
-)
 
-text_input = widgets.Text(
-    placeholder="Type your message and press Enter...",
-    layout=widgets.Layout(width="80%")
-)
-
-send_button = widgets.Button(
-    description="Send", button_style="primary", layout=widgets.Layout(width="15%")
-)
-
-clear_button = widgets.Button(
-    description="Clear Chat", button_style="danger", layout=widgets.Layout(width="15%")
-)
-
-status_label = widgets.Label(value="")
-
-input_row = widgets.HBox([text_input, send_button])
-controls_row = widgets.HBox([clear_button, status_label])
-
-# ---------- Rendering helpers ----------
-def render_message(role, content):
-    if role == "user":
-        html = f"""
-        <div style='text-align:right; margin:6px 0;'>
-            <span style='background:#DCF8C6; padding:8px 12px; border-radius:12px; display:inline-block; max-width:70%;'>
-                <b>You:</b> {content}
-            </span>
-        </div>"""
-    else:
-        html = f"""
-        <div style='text-align:left; margin:6px 0;'>
-            <span style='background:#F1F0F0; padding:8px 12px; border-radius:12px; display:inline-block; max-width:70%;'>
-                <b>AI:</b> {content}
-            </span>
-        </div>"""
-    display(HTML(html))
-
-# ---------- Core chat logic ----------
-def get_ai_response():
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        temperature=0.7,
-        max_tokens=1024,
+    st.markdown(
+        "Get your free API key from "
+        "[Groq Console](https://console.groq.com/keys)"
     )
-    return response.choices[0].message.content
 
-def send_message(_=None):
-    user_text = text_input.value.strip()
-    if not user_text:
-        return
+    # Model selection
+    MODEL = st.selectbox(
+        "🤖 Select Model",
+        [
+            "openai/gpt-oss-120b",
+            "llama-3.3-70b-versatile",
+            "llama-3.1-8b-instant"
+        ]
+    )
 
-    text_input.value = ""
-    messages.append({"role": "user", "content": user_text})
+    # Temperature control
+    temperature = st.slider(
+        "🌡️ Temperature",
+        min_value=0.0,
+        max_value=2.0,
+        value=0.7,
+        step=0.1,
+        help="Lower values give more focused answers. Higher values make responses more creative."
+    )
 
-    with chat_output:
-        render_message("user", user_text)
+    st.write(f"Current temperature: **{temperature:.1f}**")
 
-    status_label.value = "AI is typing..."
-    send_button.disabled = True
+    # Max tokens
+    max_tokens = st.slider(
+        "📝 Maximum Tokens",
+        min_value=256,
+        max_value=4096,
+        value=1024,
+        step=256
+    )
+
+    # Clear chat button
+    if st.button("🗑️ Clear Chat", use_container_width=True):
+        st.session_state.messages = [
+            {
+                "role": "system",
+                "content": "You are a helpful, concise assistant."
+            }
+        ]
+        st.rerun()
+
+
+# -------------------------------------------------
+# Initialize Conversation History
+# -------------------------------------------------
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {
+            "role": "system",
+            "content": "You are a helpful, concise assistant."
+        }
+    ]
+
+
+# -------------------------------------------------
+# Display Previous Messages
+# -------------------------------------------------
+for message in st.session_state.messages:
+
+    if message["role"] == "system":
+        continue
+
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+
+# -------------------------------------------------
+# Chat Input
+# -------------------------------------------------
+user_text = st.chat_input("Type your message here...")
+
+
+# -------------------------------------------------
+# Process User Message
+# -------------------------------------------------
+if user_text:
+
+    # Check API key
+    if not api_key:
+        st.warning("⚠️ Please enter your Groq API key in the sidebar.")
+        st.stop()
+
+    # Display user message
+    st.chat_message("user").markdown(user_text)
+
+    # Add user message to history
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": user_text
+        }
+    )
 
     try:
-        ai_text = get_ai_response()
-        messages.append({"role": "assistant", "content": ai_text})
-        with chat_output:
-            render_message("assistant", ai_text)
+        # Create Groq client
+        client = Groq(api_key=api_key)
+
+        # Get AI response
+        with st.chat_message("assistant"):
+            with st.spinner("AI is thinking..."):
+
+                response = client.chat.completions.create(
+                    model=MODEL,
+                    messages=st.session_state.messages,
+                    temperature=temperature,
+                    max_tokens=max_tokens
+                )
+
+                ai_text = response.choices[0].message.content
+
+                st.markdown(ai_text)
+
+        # Save AI response
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": ai_text
+            }
+        )
+
     except Exception as e:
-        with chat_output:
-            render_message("assistant", f"⚠️ Error: {e}")
-    finally:
-        status_label.value = ""
-        send_button.disabled = False
-
-def clear_chat(_=None):
-    global messages
-    messages = [{"role": "system", "content": "You are a helpful, concise assistant."}]
-    chat_output.clear_output()
-
-# ---------- Bind events ----------
-send_button.on_click(send_message)
-clear_button.on_click(clear_chat)
-text_input.on_submit(send_message)  # Enter key sends message
-
-# ---------- Display GUI ----------
-display(widgets.VBox([
-    widgets.HTML("<h3>🤖 Groq AI Chatbox</h3>"),
-    chat_output,
-    input_row,
-    controls_row
-]))
+        st.error(f"⚠️ Error: {e}")
+```
