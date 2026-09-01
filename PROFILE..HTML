@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Johnson S — ECE Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blueprint: #0B1E2E;
+    --blueprint-deep: #071523;
+    --paper: #F2EFE4;
+    --paper-dim: #A9BCCB;
+    --copper: #FFB454;
+    --teal: #64D9C4;
+    --violet: #B48CFF;
+    --pink: #FF7CB4;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background-color:var(--blueprint);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(100,217,196,0.10), transparent 40%),
+      radial-gradient(circle at 85% 88%, rgba(180,140,255,0.10), transparent 40%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Crect width='220' height='220' fill='none'/%3E%3Cg fill='none' stroke='%23FFB454' stroke-width='1' opacity='0.10'%3E%3Cpath d='M0 40 H60 V90 H140 V40 H220'/%3E%3Cpath d='M0 160 H50 V120 H100 V180 H220'/%3E%3Cpath d='M40 0 V30 H90 V70'/%3E%3Cpath d='M170 0 V50 H130 V90 H170 V220'/%3E%3Ccircle cx='60' cy='40' r='3.5' fill='%2364D9C4' stroke='none'/%3E%3Ccircle cx='140' cy='90' r='3.5' fill='%2364D9C4' stroke='none'/%3E%3Ccircle cx='50' cy='160' r='3.5' fill='%23B48CFF' stroke='none'/%3E%3Ccircle cx='100' cy='120' r='3.5' fill='%23B48CFF' stroke='none'/%3E%3Ccircle cx='170' cy='50' r='3.5' fill='%23FFB454' stroke='none'/%3E%3Ccircle cx='130' cy='90' r='3.5' fill='%23FFB454' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+      var(--blueprint);
+    background-size:auto, auto, 220px 220px, cover;
+    background-repeat:no-repeat, no-repeat, repeat, no-repeat;
+    background-attachment:fixed, fixed, fixed, fixed;
+    color:var(--paper);
+    font-family:var(--sans);
+    line-height:1.6;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  .particles{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .particle{ position:absolute; border-radius:50%; opacity:0.5; animation:float linear infinite; }
+  @keyframes float{
+    0%{ transform:translateY(110vh) translateX(0); opacity:0; }
+    10%{ opacity:0.55; }
+    90%{ opacity:0.4; }
+    100%{ transform:translateY(-10vh) translateX(30px); opacity:0; }
+  }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 24px 120px; position:relative; z-index:1; }
+
+  /* HERO */
+  .hero{
+    min-height:88vh; display:flex; align-items:center; gap:40px;
+    position:relative; flex-wrap:wrap;
+  }
+  .hero-text{ flex:1 1 380px; position:relative; }
+  .hero-art{ flex:1 1 300px; display:flex; justify-content:center; min-width:260px; }
+
+  .trace-svg{ position:absolute; top:-40px; left:-24px; right:-24px; width:calc(100% + 48px); height:calc(100% + 40px); pointer-events:none; z-index:-1; }
+  .trace-path{
+    fill:none; stroke:var(--copper); stroke-width:1.5;
+    stroke-dasharray:900; stroke-dashoffset:900;
+    animation:draw 2.2s ease-out forwards; opacity:0.55;
+  }
+  @keyframes draw{ to{ stroke-dashoffset:0; } }
+  .signal-dot{
+    fill:var(--teal);
+    offset-path:path("M -20,420 L 120,420 L 160,380 L 160,120 L 220,60 L 720,60");
+    animation:travel 3.5s linear infinite 2.3s, glowdot 1.2s ease-in-out infinite;
+    opacity:0;
+  }
+  @keyframes travel{ 0%{ offset-distance:0%; opacity:0; } 5%{ opacity:1; } 95%{ opacity:1; } 100%{ offset-distance:100%; opacity:0; } }
+  @keyframes glowdot{ 0%,100%{ r:3.5; } 50%{ r:5.5; } }
+  .node{ fill:var(--teal); opacity:0; animation:nodefade 0.6s ease-out forwards; }
+  @keyframes nodefade{ to{ opacity:0.9; } }
+
+  /* neural network hero illustration */
+  .nn-svg{ width:100%; max-width:340px; height:auto; opacity:0; animation:riseIn 0.9s ease-out 0.5s forwards; }
+  .nn-edge{ stroke:url(#edgeGrad); stroke-width:1; opacity:0.35; }
+  .nn-pulse{ fill:var(--teal); r:3; opacity:0; }
+  .nn-node{ stroke-width:1.5; }
+
+  .dept-tag{
+    font-family:var(--mono); font-size:13px; color:var(--copper);
+    letter-spacing:0.02em; margin-bottom:18px; display:flex; align-items:center; gap:8px;
+    opacity:0; animation:riseIn 0.7s ease-out 0.2s forwards;
+  }
+  .pulse-dot{
+    width:7px; height:7px; border-radius:50%; background:var(--teal);
+    box-shadow:0 0 0 0 rgba(100,217,196,0.6); animation:pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(100,217,196,0.5); }
+    70%{ box-shadow:0 0 0 10px rgba(100,217,196,0); }
+    100%{ box-shadow:0 0 0 0 rgba(100,217,196,0); }
+  }
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+
+  h1{
+    font-family:var(--mono); font-size:clamp(34px,6vw,54px); font-weight:700;
+    margin:0 0 12px; letter-spacing:-0.01em; position:relative; z-index:1;
+    background:linear-gradient(100deg, var(--copper), var(--pink) 35%, var(--violet) 60%, var(--teal) 85%, var(--copper));
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation:riseIn 0.8s ease-out 0.35s forwards, hue 8s linear infinite 1.2s;
+    opacity:0;
+  }
+  @keyframes hue{ 0%{ background-position:0% 50%; } 100%{ background-position:300% 50%; } }
+  .role{ font-size:17px; color:var(--paper-dim); max-width:48ch; margin:0 0 30px; opacity:0; animation:riseIn 0.7s ease-out 0.55s forwards; }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:14px 22px; font-family:var(--mono); font-size:13px; opacity:0; animation:riseIn 0.7s ease-out 0.75s forwards; }
+  .hero-meta a{ color:var(--paper); text-decoration:none; border-bottom:1px solid rgba(242,239,228,0.25); padding-bottom:2px; transition:color 0.2s, border-color 0.2s; }
+  .hero-meta a:hover{ color:var(--copper); border-color:var(--copper); }
+
+  section{ margin-top:88px; opacity:0; transform:translateY(18px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  section.visible{ opacity:1; transform:translateY(0); }
+  .sec-label{ font-family:var(--mono); font-size:12px; color:var(--teal); display:flex; align-items:center; gap:10px; margin-bottom:26px; }
+  .sec-label::after{ content:''; flex:1; height:1px; background:rgba(242,239,228,0.15); }
+
+  .about-grid{ display:flex; gap:32px; align-items:center; flex-wrap:wrap; }
+  .about p{ font-size:15.5px; color:var(--paper-dim); flex:1 1 340px; max-width:60ch; }
+  .about strong{
+    background:linear-gradient(90deg, var(--copper), var(--pink));
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; font-weight:600;
+  }
+  .chip-icon{ flex:0 0 auto; width:120px; height:120px; }
+  .chip-icon rect.core{ fill:none; stroke:var(--copper); stroke-width:1.5; }
+  .chip-icon line{ stroke:var(--teal); stroke-width:1.5; }
+  .chip-icon circle{ fill:var(--violet); }
+
+  .skills-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  .skill-chip{
+    border:1px solid rgba(242,239,228,0.18); border-radius:4px; padding:14px 16px;
+    font-family:var(--mono); font-size:13px; position:relative; overflow:hidden;
+    transition:border-color 0.25s, transform 0.25s;
+    background:rgba(11,30,46,0.4);
+    backdrop-filter:blur(2px);
+  }
+  .skill-chip:hover{ border-color:var(--copper); transform:translateY(-2px); }
+  .skill-chip::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
+    background:linear-gradient(180deg, var(--teal), var(--violet));
+    transform:scaleY(0); transform-origin:bottom; transition:transform 0.3s ease;
+  }
+  .skill-chip:hover::before{ transform:scaleY(1); }
+  .skill-chip small{ display:block; color:var(--paper-dim); font-size:11px; margin-top:4px; }
+
+  .ai-banner{
+    display:flex; align-items:center; gap:20px; margin-bottom:26px;
+    border:1px solid rgba(100,217,196,0.25); border-radius:8px; padding:18px 22px;
+    background:rgba(100,217,196,0.05);
+  }
+  .ai-banner svg{ flex:0 0 auto; width:56px; height:56px; }
+  .ai-banner p{ margin:0; font-size:14px; color:var(--paper-dim); }
+
+  .project{
+    border:1px solid rgba(242,239,228,0.15); border-radius:6px; padding:24px 26px; margin-bottom:18px;
+    background:rgba(11,30,46,0.55); backdrop-filter:blur(2px);
+    position:relative; transition:transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .project:hover{ transform:translateY(-4px); border-color:var(--teal); box-shadow:0 12px 30px -14px rgba(100,217,196,0.4); }
+  .project-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:10px; }
+  .project-head h3{ margin:0; font-size:17px; font-family:var(--mono); font-weight:600; }
+  .ai-tag{
+    font-family:var(--mono); font-size:11px; color:var(--blueprint-deep);
+    background:linear-gradient(90deg, var(--teal), var(--violet)); border-radius:3px; padding:2px 8px; white-space:nowrap;
+  }
+  .project p{ margin:0 0 14px; color:var(--paper-dim); font-size:14.5px; }
+  .stack{ display:flex; flex-wrap:wrap; gap:7px; }
+  .stack span{ font-family:var(--mono); font-size:11px; color:var(--copper); border:1px solid rgba(255,180,84,0.3); border-radius:3px; padding:2px 8px; }
+
+  .contact-box{
+    border:1px solid rgba(242,239,228,0.18); border-radius:6px; padding:28px 26px;
+    font-family:var(--mono); background:rgba(11,30,46,0.55); backdrop-filter:blur(2px);
+  }
+  .contact-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(242,239,228,0.08); font-size:14px; }
+  .contact-row:last-child{ border-bottom:none; }
+  .contact-row span:first-child{ color:var(--paper-dim); }
+  .contact-row a{ color:var(--copper); text-decoration:none; transition:color 0.2s; }
+  .contact-row a:hover{ color:var(--pink); text-decoration:underline; }
+
+  footer{ margin-top:80px; font-family:var(--mono); font-size:12px; color:var(--paper-dim); text-align:center; }
+
+  @media (max-width:640px){
+    .hero{ flex-direction:column-reverse; text-align:left; }
+    .skills-grid{ grid-template-columns:1fr; }
+    .project-head{ flex-direction:column; align-items:flex-start; gap:6px; }
+    .about-grid{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-text">
+      <svg class="trace-svg" viewBox="0 0 700 500" preserveAspectRatio="none">
+        <path class="trace-path" d="M -20,420 L 120,420 L 160,380 L 160,120 L 220,60 L 720,60" />
+        <circle class="node" cx="160" cy="380" r="4" style="animation-delay:0.9s"/>
+        <circle class="node" cx="160" cy="120" r="4" style="animation-delay:1.3s"/>
+        <circle class="node" cx="220" cy="60" r="4" style="animation-delay:1.7s"/>
+        <circle class="signal-dot" r="3.5"/>
+      </svg>
+      <div class="dept-tag"><span class="pulse-dot"></span> ECE · Sathyabama University</div>
+      <h1>Johnson S</h1>
+      <p class="role">Electronics &amp; Communication Engineering student, exploring where circuits meet intelligence — I build and break things at the intersection of embedded systems and AI.</p>
+      <div class="hero-meta">
+        <a href="mailto:son621339@gmail.com">son621339@gmail.com</a>
+        <a href="https://github.com/johnson14196" target="_blank" rel="noopener">github.com/johnson14196</a>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <!-- custom neural-network illustration representing AI -->
+      <svg class="nn-svg" viewBox="0 0 320 260" id="nnSvg">
+        <defs>
+          <linearGradient id="edgeGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#64D9C4"/>
+            <stop offset="100%" stop-color="#B48CFF"/>
+          </linearGradient>
+        </defs>
+        <!-- edges layer1-2 -->
+        <g id="edgesL1"></g>
+        <g id="edgesL2"></g>
+        <!-- nodes -->
+        <g id="nodesL1"></g>
+        <g id="nodesL2"></g>
+        <g id="nodesL3"></g>
+        <g id="pulses"></g>
+      </svg>
+    </div>
+  </div>
+
+  <section class="about">
+    <div class="sec-label">// about</div>
+    <div class="about-grid">
+      <p>I'm an <strong>ECE student at Sathyabama University</strong>, drawn to the point where hardware meets machine learning. What started as coursework in signals and circuits turned into a habit of prototyping small AI-driven projects on the side — I like taking a model out of a notebook and putting it somewhere it actually does something.</p>
+      <svg class="chip-icon" viewBox="0 0 100 100">
+        <rect class="core" x="30" y="30" width="40" height="40" rx="3"/>
+        <line x1="30" y1="42" x2="14" y2="42"/><line x1="30" y1="58" x2="14" y2="58"/>
+        <line x1="70" y1="42" x2="86" y2="42"/><line x1="70" y1="58" x2="86" y2="58"/>
+        <line x1="42" y1="30" x2="42" y2="14"/><line x1="58" y1="30" x2="58" y2="14"/>
+        <line x1="42" y1="70" x2="42" y2="86"/><line x1="58" y1="70" x2="58" y2="86"/>
+        <circle cx="42" cy="46" r="2.5"/><circle cx="58" cy="54" r="2.5"/>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// skills</div>
+    <div class="skills-grid">
+      <div class="skill-chip">Embedded Systems <small>microcontrollers, sensors</small></div>
+      <div class="skill-chip">Python <small>ML scripting &amp; automation</small></div>
+      <div class="skill-chip">Signal Processing <small>core ECE fundamentals</small></div>
+      <div class="skill-chip">Machine Learning <small>model training &amp; deployment</small></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// ai projects i've enjoyed building</div>
+
+    <div class="ai-banner">
+      <svg viewBox="0 0 60 60"><g fill="none" stroke="#64D9C4" stroke-width="2">
+        <circle cx="30" cy="30" r="10"/>
+        <line x1="30" y1="4" x2="30" y2="14"/><line x1="30" y1="46" x2="30" y2="56"/>
+        <line x1="4" y1="30" x2="14" y2="30"/><line x1="46" y1="30" x2="56" y2="30"/>
+        <line x1="11" y1="11" x2="18" y2="18"/><line x1="42" y1="42" x2="49" y2="49"/>
+        <line x1="49" y1="11" x2="42" y2="18"/><line x1="18" y1="42" x2="11" y2="49"/>
+      </g></svg>
+      <p>A running log of the AI-flavored things I've built — mostly small, all hands-on. Each one below started as curiosity about how a model actually behaves once it leaves the notebook.</p>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3>Project Name</h3>
+        <span class="ai-tag">AI</span>
+      </div>
+      <p>Describe what this project does — e.g. a model or system you trained, the problem it solves, and one interesting decision you made building it.</p>
+      <div class="stack"><span>Python</span><span>TensorFlow</span><span>Sensor Data</span></div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3>Another Project</h3>
+        <span class="ai-tag">AI</span>
+      </div>
+      <p>Short description here — what makes it interesting, what you learned, and any hardware or ECE angle that ties it back to your degree.</p>
+      <div class="stack"><span>PyTorch</span><span>Embedded C</span><span>OpenCV</span></div>
+    </div>
+
+    <div class="project">
+      <div class="project-head">
+        <h3>Third Project</h3>
+        <span class="ai-tag">AI</span>
+      </div>
+      <p>Room for one more — even a class project or hackathon build counts if it shows how you think.</p>
+      <div class="stack"><span>Python</span><span>Scikit-learn</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">// contact</div>
+    <div class="contact-box">
+      <div class="contact-row"><span>name</span><span>Johnson S</span></div>
+      <div class="contact-row"><span>department</span><span>ECE</span></div>
+      <div class="contact-row"><span>university</span><span>Sathyabama University</span></div>
+      <div class="contact-row"><span>email</span><a href="mailto:son621339@gmail.com">son621339@gmail.com</a></div>
+      <div class="contact-row"><span>github</span><a href="https://github.com/johnson14196" target="_blank" rel="noopener">johnson14196</a></div>
+    </div>
+  </section>
+
+  <footer>designed &amp; built by Johnson S</footer>
+
+</div>
+
+<script>
+  // floating particles
+  const colors = ['#FFB454','#64D9C4','#B48CFF','#FF7CB4'];
+  const layer = document.getElementById('particles');
+  for(let i=0;i<26;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2 + Math.random()*3;
+    p.style.width = size+'px';
+    p.style.height = size+'px';
+    p.style.left = (Math.random()*100)+'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (10 + Math.random()*14)+'s';
+    p.style.animationDelay = (Math.random()*10)+'s';
+    layer.appendChild(p);
+  }
+
+  // reveal sections on scroll
+  const sections = document.querySelectorAll('section');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold:0.15 });
+  sections.forEach(s=>io.observe(s));
+
+  // build neural network illustration
+  const L1 = [{x:20,y:60},{x:20,y:130},{x:20,y:200}];
+  const L2 = [{x:150,y:40},{x:150,y:100},{x:150,y:160},{x:150,y:220}];
+  const L3 = [{x:290,y:80},{x:290,y:150},{x:290,y:210}];
+  const nodeColors = ['#FFB454','#64D9C4','#B48CFF'];
+
+  function makeEdges(from, to, groupId){
+    const g = document.getElementById(groupId);
+    from.forEach(a=>{
+      to.forEach(b=>{
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+        line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+        line.setAttribute('class','nn-edge');
+        g.appendChild(line);
+      });
+    });
+  }
+  makeEdges(L1, L2, 'edgesL1');
+  makeEdges(L2, L3, 'edgesL2');
+
+  function makeNodes(layer, groupId){
+    const g = document.getElementById(groupId);
+    layer.forEach((n,i)=>{
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r',6);
+      c.setAttribute('class','nn-node');
+      c.setAttribute('fill', 'rgba(242,239,228,0.08)');
+      c.setAttribute('stroke', nodeColors[i % nodeColors.length]);
+      g.appendChild(c);
+    });
+  }
+  makeNodes(L1,'nodesL1'); makeNodes(L2,'nodesL2'); makeNodes(L3,'nodesL3');
+
+  // traveling pulses along random edges
+  const pulseGroup = document.getElementById('pulses');
+  function spawnPulse(){
+    const fromLayer = Math.random() < 0.5 ? L1 : L2;
+    const toLayer = fromLayer === L1 ? L2 : L3;
+    const a = fromLayer[Math.floor(Math.random()*fromLayer.length)];
+    const b = toLayer[Math.floor(Math.random()*toLayer.length)];
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('r',3);
+    dot.setAttribute('class','nn-pulse');
+    dot.style.fill = nodeColors[Math.floor(Math.random()*nodeColors.length)];
+    pulseGroup.appendChild(dot);
+    const dur = 900 + Math.random()*500;
+    const start = performance.now();
+    function step(t){
+      const p = Math.min(1,(t-start)/dur);
+      dot.setAttribute('cx', a.x + (b.x-a.x)*p);
+      dot.setAttribute('cy', a.y + (b.y-a.y)*p);
+      dot.style.opacity = p < 0.1 ? p*10 : (p > 0.85 ? (1-p)/0.15 : 1);
+      if(p<1) requestAnimationFrame(step); else dot.remove();
+    }
+    requestAnimationFrame(step);
+  }
+  setInterval(spawnPulse, 380);
+</script>
+
+</body>
+</html>
